@@ -14,7 +14,8 @@ type ReceiptEditorProps = {
   scan: ScanResult;
   onSave: (items: EditableItem[]) => void;
   onScanAnother: () => void;
-  saveHint?: string;
+  saving?: boolean;
+  saveError?: string;
 };
 
 let nextId = 0;
@@ -37,7 +38,8 @@ export function ReceiptEditor({
   scan,
   onSave,
   onScanAnother,
-  saveHint,
+  saving,
+  saveError,
 }: ReceiptEditorProps) {
   const [items, setItems] = useState<EditableItem[]>(() => toEditableItems(scan));
 
@@ -110,12 +112,12 @@ export function ReceiptEditor({
               {formatMoney(receiptTotalCents(items))}
             </div>
           </div>
-          <ScanCtaButton onClick={() => onSave(items)}>
-            Save this receipt
+          <ScanCtaButton onClick={() => onSave(items)} disabled={saving}>
+            {saving ? "Saving" : "Save this receipt"}
           </ScanCtaButton>
         </div>
         <div className="mx-auto flex max-w-md flex-col items-center gap-1 px-4 pb-3 text-center">
-          {saveHint && <p className="text-caption text-danger">{saveHint}</p>}
+          {saveError && <p className="text-caption text-danger">{saveError}</p>}
           <button
             type="button"
             onClick={onScanAnother}

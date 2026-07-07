@@ -8,6 +8,8 @@ import { Button } from "@/components/ui/button";
 import { ScanCtaButton } from "@/components/brand/scan-cta-button";
 import { ScanProgress } from "@/components/brand/scan-progress";
 import { ReceiptEditor } from "@/components/receipt/receipt-editor";
+import type { EditableItem } from "@/components/receipt/item-row";
+import { formatMoney, parsePriceCents, receiptTotalCents } from "@/lib/money";
 import type { ScanResult } from "@/lib/receipt-schema";
 
 const MAX_FILE_BYTES = 8 * 1024 * 1024;
@@ -40,7 +42,8 @@ type ScanState =
   | { phase: "idle" }
   | { phase: "scanning" }
   | { phase: "error"; code: string }
-  | { phase: "parsed"; scan: ScanResult };
+  | { phase: "parsed"; scan: ScanResult }
+  | { phase: "saved"; itemCount: number; totalCents: number };
 
 function ScanFlow() {
   const searchParams = useSearchParams();
@@ -49,7 +52,8 @@ function ScanFlow() {
       ? { phase: "parsed", scan: FIXTURE_SCAN }
       : { phase: "idle" },
   );
-  const [saveHint, setSaveHint] = useState<string>();
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string>();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const pickFile = () => fileInputRef.current?.click();
@@ -76,9 +80,51 @@ function ScanFlow() {
   };
 
   const reset = () => {
-    setSaveHint(undefined);
+    setSaveError(undefined);
     if (fileInputRef.current) fileInputRef.current.value = "";
     setState({ phase: "idle" });
+  };
+
+  const handleSave = async (scan: ScanResult, items: EditableItem[]) => {
+    setSaveError(undefined);
+    const invalid = items.some(
+      (item) => item.name.trim() === "" || parsePriceCents(item.unitPrice) === null,
+    );
+    if (items.length === 0 || invalid) {
+      setSaveError("Every item needs a name and a price.");
+      return;
+    }
+    setSaving(true);
+    try {
+      const res = await fetch("/api/receipts", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          store: scan.store,
+          date: scan.date,
+          total_cents: scan.total === null ? null : Math.round(scan.total * 100),
+          items: items.map((item) => ({
+            name: item.name.trim(),
+            quantity: item.quantity,
+            unit_price_cents: parsePriceCents(item.unitPrice) ?? 0,
+            category: item.category,
+          })),
+        }),
+      });
+      if (!res.ok) {
+        setSaveError("Couldn't save that receipt. Try again.");
+        return;
+      }
+      setState({
+        phase: "saved",
+        itemCount: items.length,
+        totalCents: receiptTotalCents(items),
+      });
+    } catch {
+      setSaveError("Couldn't save that receipt. Try again.");
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -146,10 +192,24 @@ function ScanFlow() {
       {state.phase === "parsed" && (
         <ReceiptEditor
           scan={state.scan}
-          saveHint={saveHint}
-          onSave={() => setSaveHint("Not saved yet. Storage connects next.")}
+          saving={saving}
+          saveError={saveError}
+          onSave={(items) => void handleSave(state.scan, items)}
           onScanAnother={reset}
         />
+      )}
+
+      {state.phase === "saved" && (
+        <div className="flex flex-col items-start gap-2 px-4 pt-10">
+          <h1 className="text-heading-lg">Saved.</h1>
+          <p className="font-mono text-data">
+            {state.itemCount} {state.itemCount === 1 ? "item" : "items"} ·{" "}
+            {formatMoney(state.totalCents)}
+          </p>
+          <ScanCtaButton onClick={reset} className="mt-4">
+            Scan another receipt
+          </ScanCtaButton>
+        </div>
       )}
     </main>
   );
