@@ -1,4 +1,5 @@
 import { ScanMark } from "@/components/brand/scan-mark";
+import { ScanCtaButton } from "@/components/brand/scan-cta-button";
 
 export default function Home() {
   return (
@@ -11,6 +12,9 @@ export default function Home() {
         </div>
         <p className="text-body text-ink-secondary">See it clearly.</p>
         <p className="font-mono text-data">0 receipts · $0.00</p>
+        <ScanCtaButton href="/scan" className="mt-2 self-start">
+          Scan a receipt
+        </ScanCtaButton>
       </div>
     </main>
   );

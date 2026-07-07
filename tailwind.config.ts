@@ -72,6 +72,16 @@ const config: Config = {
         data: ["13px", { lineHeight: "1.4", fontWeight: "400" }],
         "data-sm": ["11px", { lineHeight: "1.3", fontWeight: "400" }],
       },
+      keyframes: {
+        scan: {
+          "0%": { width: "0%" },
+          "75%": { width: "100%" },
+          "100%": { width: "100%" },
+        },
+      },
+      animation: {
+        scan: "scan 1.8s ease-in-out infinite",
+      },
     },
   },
   plugins: [require("tailwindcss-animate")],
