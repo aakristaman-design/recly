@@ -25,7 +25,13 @@ const MONO_TICK = {
   fill: "#8A877F",
 };
 
-export function TrendChart({ points }: { points: TrendPoint[] }) {
+export function TrendChart({
+  points,
+  color = "#1A6B45",
+}: {
+  points: TrendPoint[];
+  color?: string;
+}) {
   const data = points.map((p) => ({ ...p, dollars: p.cents / 100 }));
   return (
     <div className="h-48 w-full">
@@ -50,7 +56,7 @@ export function TrendChart({ points }: { points: TrendPoint[] }) {
             {data.map((point) => (
               <Cell
                 key={point.label}
-                fill={point.isCurrentMonth ? "#1A6B45" : "#D8D4CC"}
+                fill={point.isCurrentMonth ? color : "#D8D4CC"}
               />
             ))}
           </Bar>

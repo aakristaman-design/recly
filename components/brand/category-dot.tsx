@@ -3,6 +3,15 @@ import type { Category } from "@/lib/receipt-schema";
 
 // One dedicated accent per category (v2.0 §04, Decision 5) — the dot is the
 // visual shortcut; the label does the naming.
+export const CATEGORY_HEX: Record<Category, string> = {
+  Produce: "#4A9E6B",
+  Dairy: "#4A7EC4",
+  Meat: "#D4697A",
+  Bakery: "#E8A830",
+  Snacks: "#E07840",
+  Household: "#8B6EC4",
+};
+
 const DOT_CLASS: Record<Category, string> = {
   Produce: "bg-category-produce",
   Dairy: "bg-category-dairy",

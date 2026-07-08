@@ -1,4 +1,5 @@
-import { ReceiptText } from "lucide-react";
+import Link from "next/link";
+import { ChevronRight, ReceiptText } from "lucide-react";
 import { ScanMark } from "@/components/brand/scan-mark";
 import { ScanFab } from "@/components/brand/scan-fab";
 import { SectionHeading } from "@/components/brand/section-heading";
@@ -127,9 +128,10 @@ export default async function Dashboard() {
               <SectionHeading>Category breakdown</SectionHeading>
               <div className="mt-3 rounded-xl border border-border bg-surface-card">
                 {categoryRows.map((row) => (
-                  <div
+                  <Link
                     key={row.category}
-                    className="flex items-center gap-3 border-b border-border-light p-4 last:border-b-0"
+                    href={`/category/${row.category.toLowerCase()}`}
+                    className="flex items-center gap-3 border-b border-border-light p-4 transition-colors last:border-b-0 hover:bg-surface-faint"
                   >
                     <CategoryDot category={row.category} />
                     <span className="text-body lowercase">{row.category}</span>
@@ -141,7 +143,8 @@ export default async function Dashboard() {
                         ? `${Math.round((row.total_cents / monthTotalCents) * 100)}%`
                         : "—"}
                     </span>
-                  </div>
+                    <ChevronRight className="h-4 w-4 shrink-0 text-ink-tertiary" />
+                  </Link>
                 ))}
               </div>
             </section>

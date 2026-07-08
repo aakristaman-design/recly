@@ -15,8 +15,15 @@ const dmMono = DM_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Recly",
-  description: "See it clearly.",
+  title: "Recly — See it clearly.",
+  description:
+    "Receipt-level grocery spending. Every item. Every trip. Clearly.",
+};
+
+export const viewport = {
+  themeColor: "#FAF7F2",
+  width: "device-width",
+  initialScale: 1,
 };
 
 export default function RootLayout({
