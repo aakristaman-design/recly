@@ -7,4 +7,14 @@
   body {
     @apply bg-surface-page text-ink font-sans text-body antialiased;
   }
+
+  /* iOS Safari zooms the page when a focused input is under 16px — keep
+     inputs at 16px on touch devices so the correction flow doesn't jump. */
+  @media (pointer: coarse) {
+    input,
+    select,
+    textarea {
+      font-size: 16px;
+    }
+  }
 }

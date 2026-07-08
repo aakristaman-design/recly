@@ -9,7 +9,12 @@ import { ScanCtaButton } from "@/components/brand/scan-cta-button";
 import { ScanProgress } from "@/components/brand/scan-progress";
 import { ReceiptEditor } from "@/components/receipt/receipt-editor";
 import type { EditableItem } from "@/components/receipt/item-row";
-import { formatMoney, parsePriceCents, receiptTotalCents } from "@/lib/money";
+import {
+  formatMoney,
+  parsePriceCents,
+  receiptTotalCents,
+  unitCount,
+} from "@/lib/money";
 import type { ScanResult } from "@/lib/receipt-schema";
 
 const MAX_FILE_BYTES = 8 * 1024 * 1024;
@@ -117,7 +122,7 @@ function ScanFlow() {
       }
       setState({
         phase: "saved",
-        itemCount: items.length,
+        itemCount: unitCount(items),
         totalCents: receiptTotalCents(items),
       });
     } catch {

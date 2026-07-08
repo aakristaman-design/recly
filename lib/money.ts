@@ -25,3 +25,9 @@ export function receiptTotalCents(items: EditableItem[]): number {
 export function formatMoney(cents: number): string {
   return `$${(cents / 100).toFixed(2)}`;
 }
+
+// "Items" always means units purchased (a 2× line is 2 items) — the same
+// definition everywhere: editor headline, saved state, dashboard, receipts.
+export function unitCount(items: { quantity: number }[]): number {
+  return items.reduce((sum, item) => sum + item.quantity, 0);
+}

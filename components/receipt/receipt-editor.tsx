@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Plus } from "lucide-react";
 import { ItemRow, type EditableItem } from "@/components/receipt/item-row";
 import { ScanCtaButton } from "@/components/brand/scan-cta-button";
-import { formatMoney, receiptTotalCents } from "@/lib/money";
+import { formatMoney, receiptTotalCents, unitCount } from "@/lib/money";
 import type { ScanResult } from "@/lib/receipt-schema";
 
 // Screen 05 — the human-in-the-loop correction layer (Decision 2). Structure
@@ -70,7 +70,8 @@ export function ReceiptEditor({
     <div className="pb-40">
       <header className="px-4 pt-6">
         <h1 className="text-heading-lg">
-          That&apos;s {scan.items.length} {scan.items.length === 1 ? "item" : "items"}.{" "}
+          That&apos;s {unitCount(scan.items)}{" "}
+          {unitCount(scan.items) === 1 ? "item" : "items"}.{" "}
           {formatMoney(headlineTotalCents)} total.
         </h1>
         <p className="mt-1 text-body text-ink-secondary">

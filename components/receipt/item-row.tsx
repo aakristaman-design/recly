@@ -38,7 +38,7 @@ function StepButton({
       type="button"
       aria-label={label}
       onClick={onClick}
-      className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-border-light bg-surface-faint text-ink-secondary transition-colors hover:border-border hover:text-ink"
+      className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-border-light bg-surface-faint text-ink-secondary transition-colors hover:border-border hover:text-ink"
     >
       {children}
     </button>
@@ -60,9 +60,9 @@ export function ItemRow({ item, onChange, onRemove }: ItemRowProps) {
           type="button"
           aria-label={`Remove ${item.name || "item"}`}
           onClick={onRemove}
-          className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-ink-tertiary transition-colors hover:bg-danger-bg hover:text-danger"
+          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-ink-tertiary transition-colors hover:bg-danger-bg hover:text-danger"
         >
-          <X className="h-3.5 w-3.5" />
+          <X className="h-4 w-4" />
         </button>
       </div>
 

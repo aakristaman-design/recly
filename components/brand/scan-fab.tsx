@@ -8,7 +8,7 @@ export function ScanFab() {
     <Link
       href="/scan"
       aria-label="Scan a receipt"
-      className="fixed bottom-6 left-1/2 flex h-14 w-14 -translate-x-1/2 items-center justify-center rounded-full bg-green text-cream shadow-lg transition-transform hover:scale-105"
+      className="fixed bottom-[max(1.5rem,env(safe-area-inset-bottom))] left-1/2 flex h-14 w-14 -translate-x-1/2 items-center justify-center rounded-full bg-green text-cream shadow-lg transition-transform hover:scale-105"
     >
       <ScanLine className="h-6 w-6" />
     </Link>
