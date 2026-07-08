@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 import { ChevronRight, ReceiptText } from "lucide-react";
 import { ScanMark } from "@/components/brand/scan-mark";
 import { ScanFab } from "@/components/brand/scan-fab";
@@ -50,6 +52,9 @@ function headlineFor(
 }
 
 export default async function Dashboard() {
+  // First visit → onboarding (screen 10). GetStarted sets the cookie.
+  if (!cookies().get("recly_onboarded")) redirect("/welcome");
+
   const { monthlyTotals, monthlyCategoryTotals, recentReceipts } =
     await fetchDashboardData();
 
