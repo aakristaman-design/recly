@@ -209,6 +209,12 @@ function ScanFlow() {
           <ScanCtaButton onClick={reset} className="mt-4">
             Scan another receipt
           </ScanCtaButton>
+          <Link
+            href="/"
+            className="mt-1 text-body text-ink-secondary underline-offset-4 hover:underline"
+          >
+            See the dashboard
+          </Link>
         </div>
       )}
     </main>
