@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { ScanCtaButton } from "@/components/brand/scan-cta-button";
 
 export default function NotFound() {
