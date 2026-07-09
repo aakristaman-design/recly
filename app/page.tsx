@@ -201,7 +201,7 @@ export default async function Dashboard({
               {recentReceipts.map((receipt) => (
                 <Link
                   key={receipt.id}
-                  href="/receipts"
+                  href={`/receipts?open=${receipt.id}#${receipt.id}`}
                   className="flex items-center gap-3 border-b border-border-light p-4 transition-colors last:border-b-0 hover:bg-surface-faint"
                 >
                   <span className="flex h-10 w-10 items-center justify-center rounded-full bg-surface-faint">

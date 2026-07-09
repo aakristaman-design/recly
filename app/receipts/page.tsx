@@ -42,7 +42,11 @@ function dominantCategory(items: ReceiptItemLine[]): Category | null {
   return best;
 }
 
-export default async function ReceiptHistory() {
+export default async function ReceiptHistory({
+  searchParams,
+}: {
+  searchParams: { open?: string };
+}) {
   const { receipts, itemsByReceipt } = await fetchReceiptHistory();
   const totalCents = receipts.reduce((s, r) => s + r.items_total_cents, 0);
 
@@ -77,7 +81,9 @@ export default async function ReceiptHistory() {
               return (
                 <details
                   key={receipt.id}
-                  className="group overflow-hidden rounded-xl border border-border bg-surface-card"
+                  id={receipt.id}
+                  open={receipt.id === searchParams.open || undefined}
+                  className="group scroll-mt-4 overflow-hidden rounded-xl border border-border bg-surface-card"
                   style={{
                     borderLeftWidth: 3,
                     borderLeftColor: accent ? CATEGORY_HEX[accent] : "#D8D4CC",
