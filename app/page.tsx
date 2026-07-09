@@ -187,12 +187,21 @@ export default async function Dashboard({
           )}
 
           <section className="mt-8">
-            <SectionHeading>Recent receipts</SectionHeading>
+            <div className="flex items-baseline justify-between">
+              <SectionHeading>Recent receipts</SectionHeading>
+              <Link
+                href="/receipts"
+                className="text-caption text-ink-secondary underline-offset-2 hover:text-ink hover:underline"
+              >
+                View all
+              </Link>
+            </div>
             <div className="mt-3 rounded-xl border border-border bg-surface-card">
               {recentReceipts.map((receipt) => (
-                <div
+                <Link
                   key={receipt.id}
-                  className="flex items-center gap-3 border-b border-border-light p-4 last:border-b-0"
+                  href="/receipts"
+                  className="flex items-center gap-3 border-b border-border-light p-4 transition-colors last:border-b-0 hover:bg-surface-faint"
                 >
                   <span className="flex h-10 w-10 items-center justify-center rounded-full bg-surface-faint">
                     <ReceiptText className="h-4 w-4 text-ink-secondary" />
@@ -210,7 +219,8 @@ export default async function Dashboard({
                   <span className="ml-auto font-mono text-data">
                     {formatMoney(receipt.items_total_cents)}
                   </span>
-                </div>
+                  <ChevronRight className="h-4 w-4 shrink-0 text-ink-tertiary" />
+                </Link>
               ))}
             </div>
           </section>

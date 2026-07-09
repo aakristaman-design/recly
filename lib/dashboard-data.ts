@@ -52,6 +52,45 @@ export async function fetchDashboardData(): Promise<DashboardData> {
   };
 }
 
+export type ReceiptItemLine = {
+  receipt_id: string;
+  name: string;
+  quantity: number;
+  unit_price_cents: number;
+  category: Category;
+};
+
+// Receipt history (screen 09): every receipt plus its item lines.
+export async function fetchReceiptHistory(): Promise<{
+  receipts: ReceiptSummary[];
+  itemsByReceipt: Map<string, ReceiptItemLine[]>;
+}> {
+  const supabase = createPublicSupabase();
+  const { data: receipts } = await supabase
+    .from("receipt_summaries")
+    .select("*")
+    .order("scanned_at", { ascending: false });
+
+  const ids = (receipts ?? []).map((r) => r.id);
+  const { data: items } = ids.length
+    ? await supabase
+        .from("receipt_items")
+        .select("receipt_id,name,quantity,unit_price_cents,category")
+        .in("receipt_id", ids)
+    : { data: [] };
+
+  const itemsByReceipt = new Map<string, ReceiptItemLine[]>();
+  for (const item of (items ?? []) as ReceiptItemLine[]) {
+    const list = itemsByReceipt.get(item.receipt_id) ?? [];
+    list.push(item);
+    itemsByReceipt.set(item.receipt_id, list);
+  }
+  return {
+    receipts: (receipts ?? []) as ReceiptSummary[],
+    itemsByReceipt,
+  };
+}
+
 export function monthKey(date: Date): string {
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-01`;
 }
