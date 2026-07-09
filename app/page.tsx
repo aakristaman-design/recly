@@ -6,7 +6,6 @@ import { ScanMark } from "@/components/brand/scan-mark";
 import { ScanFab } from "@/components/brand/scan-fab";
 import { SectionHeading } from "@/components/brand/section-heading";
 import { CategoryDot } from "@/components/brand/category-dot";
-import { ScanCtaButton } from "@/components/brand/scan-cta-button";
 import { TrendChart } from "@/components/dashboard/trend-chart";
 import {
   fetchDashboardData,
@@ -51,12 +50,21 @@ function headlineFor(
   return `${top.category} was your biggest category. ${formatMoney(top.total_cents)}${comparison}.`;
 }
 
-export default async function Dashboard() {
+export default async function Dashboard({
+  searchParams,
+}: {
+  searchParams: { empty?: string };
+}) {
   // First visit → onboarding (screen 10). GetStarted sets the cookie.
   if (!cookies().get("recly_onboarded")) redirect("/welcome");
 
+  // ?empty=1 previews the zero-receipt state without touching stored data —
+  // it swaps in empty data and everything below renders the exact branch a
+  // genuinely empty account hits. Same convention as /scan?fixture=1.
   const { monthlyTotals, monthlyCategoryTotals, recentReceipts } =
-    await fetchDashboardData();
+    searchParams.empty === "1"
+      ? { monthlyTotals: [], monthlyCategoryTotals: [], recentReceipts: [] }
+      : await fetchDashboardData();
 
   const now = new Date();
   const thisMonthKey = monthKey(now);
@@ -84,6 +92,35 @@ export default async function Dashboard() {
 
   const empty = monthlyTotals.length === 0;
 
+  // Screen 01 — empty dashboard. Structure from Figma node 1:1925 (hero
+  // zero-state + FAB per the §09 component inventory; the inline CTA and
+  // bottom nav are off-inventory). Copy: §06 playful tagline (documented
+  // empty-state usage) + §08 stats format. No month header — there is no
+  // data to read back, and deadpan means not announcing an empty month.
+  if (empty) {
+    return (
+      <main className="mx-auto flex min-h-screen max-w-md flex-col px-4 pb-28 pt-6">
+        <div className="inline-flex flex-col self-start">
+          <span className="text-heading-md lowercase">recly</span>
+          <ScanMark size="sm" style={{ marginTop: -1 }} />
+        </div>
+
+        <div className="flex flex-1 flex-col items-center justify-center gap-4 text-center">
+          <span className="flex h-24 w-24 items-center justify-center rounded-full border border-dashed border-border">
+            <ReceiptText className="h-8 w-8 text-ink-tertiary" />
+          </span>
+          <h1 className="mt-2 text-heading-lg">Your receipts, recly.</h1>
+          <p className="font-mono text-data text-ink-secondary">
+            0 receipts · $0.00
+          </p>
+          <p className="text-body text-ink-secondary">Scan the first one.</p>
+        </div>
+
+        <ScanFab />
+      </main>
+    );
+  }
+
   return (
     <main className="mx-auto max-w-md px-4 pb-28 pt-6">
       <div className="inline-flex flex-col">
@@ -100,13 +137,7 @@ export default async function Dashboard() {
         </h1>
       </header>
 
-      {empty ? (
-        <div className="mt-8 flex flex-col items-start gap-4">
-          <p className="font-mono text-data">0 receipts · $0.00</p>
-          <ScanCtaButton href="/scan">Scan a receipt</ScanCtaButton>
-        </div>
-      ) : (
-        <>
+      <>
           <section className="mt-6 rounded-xl border border-border bg-surface-card p-5">
             <p className="text-label uppercase text-ink-secondary">Total spent</p>
             <p className="mt-2 font-mono text-[40px] leading-none">
@@ -183,8 +214,7 @@ export default async function Dashboard() {
               ))}
             </div>
           </section>
-        </>
-      )}
+      </>
 
       <ScanFab />
     </main>
