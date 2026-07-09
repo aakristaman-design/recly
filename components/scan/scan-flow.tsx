@@ -1,9 +1,6 @@
 "use client";
 
-import { Suspense, useRef, useState } from "react";
-import Link from "next/link";
-import { useSearchParams } from "next/navigation";
-import { ArrowLeft } from "lucide-react";
+import { useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ScanCtaButton } from "@/components/brand/scan-cta-button";
 import { ScanProgress } from "@/components/brand/scan-progress";
@@ -50,12 +47,20 @@ type ScanState =
   | { phase: "parsed"; scan: ScanResult }
   | { phase: "saved"; itemCount: number; totalCents: number };
 
-function ScanFlow() {
-  const searchParams = useSearchParams();
+type ScanFlowProps = {
+  // preview/demo only: start in the parsed state with the fixture receipt
+  initialFixture?: boolean;
+  // fires after a successful save so the host can refresh data behind it
+  onSaved?: () => void;
+};
+
+// The scan state machine (idle → scanning → parsed → saved, error branch),
+// presentation-agnostic: it renders the same inside the bottom sheet as it
+// did on the old /scan page. State lives here, so unmounting (closing the
+// sheet) discards any unsaved parse cleanly.
+export function ScanFlow({ initialFixture, onSaved }: ScanFlowProps) {
   const [state, setState] = useState<ScanState>(() =>
-    searchParams.get("fixture") === "1"
-      ? { phase: "parsed", scan: FIXTURE_SCAN }
-      : { phase: "idle" },
+    initialFixture ? { phase: "parsed", scan: FIXTURE_SCAN } : { phase: "idle" },
   );
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string>();
@@ -125,6 +130,7 @@ function ScanFlow() {
         itemCount: unitCount(items),
         totalCents: receiptTotalCents(items),
       });
+      onSaved?.();
     } catch {
       setSaveError("Couldn't save that receipt. Try again.");
     } finally {
@@ -133,7 +139,7 @@ function ScanFlow() {
   };
 
   return (
-    <main className="mx-auto min-h-screen max-w-md">
+    <div>
       <input
         ref={fileInputRef}
         type="file"
@@ -145,19 +151,9 @@ function ScanFlow() {
         }}
       />
 
-      <div className="flex items-center px-4 pt-4">
-        <Link
-          href="/"
-          aria-label="Back"
-          className="flex h-10 w-10 items-center justify-center rounded-full text-ink-secondary transition-colors hover:bg-surface-faint hover:text-ink"
-        >
-          <ArrowLeft className="h-5 w-5" />
-        </Link>
-      </div>
-
       {state.phase === "idle" && (
-        <div className="flex flex-col items-start gap-2 px-4 pt-10">
-          <h1 className="text-heading-lg">Scan a receipt</h1>
+        <div className="flex flex-col items-start gap-2 px-4 pb-8 pt-5">
+          <h2 className="text-heading-lg">Scan a receipt</h2>
           <p className="text-body text-ink-secondary">
             Upload a photo of a grocery receipt.
           </p>
@@ -171,7 +167,7 @@ function ScanFlow() {
       )}
 
       {state.phase === "scanning" && (
-        <div className="flex flex-col gap-4 px-4 pt-10">
+        <div className="flex flex-col gap-4 px-4 pb-8 pt-5">
           <p className="text-body">Reading the receipt.</p>
           <ScanProgress />
           <p className="text-caption text-ink-secondary">
@@ -181,7 +177,7 @@ function ScanFlow() {
       )}
 
       {state.phase === "error" && (
-        <div className="flex flex-col items-start gap-2 px-4 pt-10">
+        <div className="flex flex-col items-start gap-2 px-4 pb-8 pt-5">
           <div className="w-full rounded-xl border border-danger/30 bg-danger-bg p-4">
             <p className="text-body font-medium">Couldn&apos;t read that.</p>
             <p className="mt-1 text-body text-ink-secondary">
@@ -205,8 +201,8 @@ function ScanFlow() {
       )}
 
       {state.phase === "saved" && (
-        <div className="flex flex-col items-start gap-2 px-4 pt-10">
-          <h1 className="text-heading-lg">Saved.</h1>
+        <div className="flex flex-col items-start gap-2 px-4 pb-8 pt-5">
+          <h2 className="text-heading-lg">Saved.</h2>
           <p className="font-mono text-data">
             {state.itemCount} {state.itemCount === 1 ? "item" : "items"} ·{" "}
             {formatMoney(state.totalCents)}
@@ -214,22 +210,8 @@ function ScanFlow() {
           <ScanCtaButton onClick={reset} className="mt-4">
             Scan another receipt
           </ScanCtaButton>
-          <Link
-            href="/"
-            className="mt-1 text-body text-ink-secondary underline-offset-4 hover:underline"
-          >
-            See the dashboard
-          </Link>
         </div>
       )}
-    </main>
-  );
-}
-
-export default function ScanPage() {
-  return (
-    <Suspense>
-      <ScanFlow />
-    </Suspense>
+    </div>
   );
 }

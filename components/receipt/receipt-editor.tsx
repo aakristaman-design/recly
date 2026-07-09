@@ -67,13 +67,13 @@ export function ReceiptEditor({
     scan.total !== null ? Math.round(scan.total * 100) : receiptTotalCents(items);
 
   return (
-    <div className="pb-40">
-      <header className="px-4 pt-6">
-        <h1 className="text-heading-lg">
+    <div>
+      <header className="px-4 pt-5">
+        <h2 className="text-heading-lg">
           That&apos;s {unitCount(scan.items)}{" "}
           {unitCount(scan.items) === 1 ? "item" : "items"}.{" "}
           {formatMoney(headlineTotalCents)} total.
-        </h1>
+        </h2>
         <p className="mt-1 text-body text-ink-secondary">
           Here&apos;s what was on that receipt.
         </p>
@@ -105,7 +105,9 @@ export function ReceiptEditor({
         </div>
       </div>
 
-      <footer className="fixed inset-x-0 bottom-0 border-t border-border bg-surface-card pb-[env(safe-area-inset-bottom)]">
+      {/* sticky within the sheet's scroll container (Decision 4: the confirm
+          CTA and live total stay reachable while correcting long receipts) */}
+      <footer className="sticky bottom-0 mt-4 border-t border-border bg-surface-card pb-[env(safe-area-inset-bottom)]">
         <div className="mx-auto flex max-w-md items-center justify-between gap-4 px-4 py-3">
           <div>
             <div className="text-label uppercase text-ink-secondary">Total</div>
