@@ -1,17 +1,50 @@
 import { z } from "zod";
 
-// The six locked categories (v2.0 §04). OCR must choose one per item;
-// the parsed-receipt screen is where the user corrects wrong guesses.
+// The nine locked categories (category addendum v1.1, superseding v2.0 §04's
+// six). OCR must choose one per item; the parsed-receipt screen is where the
+// user corrects wrong guesses.
 export const CATEGORIES = [
   "Produce",
-  "Dairy",
-  "Meat",
+  "Dairy & Eggs",
+  "Meat & Seafood",
   "Bakery",
+  "Pantry",
+  "Beverages",
   "Snacks",
   "Household",
+  "Dining Out",
 ] as const;
 
 export type Category = (typeof CATEGORIES)[number];
+
+// URL slugs, from the addendum's token names (category/dining-out etc.).
+export const CATEGORY_SLUG: Record<Category, string> = {
+  Produce: "produce",
+  "Dairy & Eggs": "dairy",
+  "Meat & Seafood": "meat",
+  Bakery: "bakery",
+  Pantry: "pantry",
+  Beverages: "beverages",
+  Snacks: "snacks",
+  Household: "household",
+  "Dining Out": "dining-out",
+};
+
+export function categoryFromSlug(slug: string): Category | undefined {
+  const lower = slug.toLowerCase();
+  return CATEGORIES.find((c) => CATEGORY_SLUG[c] === lower);
+}
+
+// Rows written under the six-category taxonomy keep their stored values
+// (v1.1: rename-on-read, no backfill). SQL views normalize for aggregation;
+// this covers direct table reads.
+export function normalizeCategory(raw: string): Category {
+  if (raw === "Dairy") return "Dairy & Eggs";
+  if (raw === "Meat") return "Meat & Seafood";
+  return (CATEGORIES as readonly string[]).includes(raw)
+    ? (raw as Category)
+    : "Household";
+}
 
 export const receiptItemSchema = z.object({
   name: z.string().min(1),

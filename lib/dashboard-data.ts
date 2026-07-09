@@ -1,5 +1,5 @@
 import { createPublicSupabase } from "@/lib/supabase-public";
-import type { Category } from "@/lib/receipt-schema";
+import { normalizeCategory, type Category } from "@/lib/receipt-schema";
 
 // All dashboard numbers come from the SQL views (v2.0 §12): the frontend
 // renders aggregates, it never computes insights from raw OCR output.
@@ -80,7 +80,11 @@ export async function fetchReceiptHistory(): Promise<{
     : { data: [] };
 
   const itemsByReceipt = new Map<string, ReceiptItemLine[]>();
-  for (const item of (items ?? []) as ReceiptItemLine[]) {
+  for (const raw of (items ?? []) as (Omit<ReceiptItemLine, "category"> & {
+    category: string;
+  })[]) {
+    // legacy six-category rows normalize on read (addendum v1.1, no backfill)
+    const item = { ...raw, category: normalizeCategory(raw.category) };
     const list = itemsByReceipt.get(item.receipt_id) ?? [];
     list.push(item);
     itemsByReceipt.set(item.receipt_id, list);

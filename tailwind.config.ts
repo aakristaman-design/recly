@@ -34,14 +34,19 @@ const config: Config = {
           DEFAULT: "#C4544C", // text/danger
           bg: "#FDF0EF", // bg/danger
         },
-        // category palette — in-product UI only (charts, tags, receipt rows)
+        // category palette — in-product UI only (charts, tags, receipt rows).
+        // Nine categories per addendum v1.1; dining-out deliberately reuses
+        // the text/secondary grey so it doesn't compete with food categories.
         category: {
           produce: "#4A9E6B",
           dairy: "#4A7EC4",
           meat: "#D4697A",
           bakery: "#E8A830",
+          pantry: "#B08968",
+          beverages: "#5FA8A0",
           snacks: "#E07840",
           household: "#8B6EC4",
+          "dining-out": "#8A877F",
         },
         // shadcn semantic slots, mapped straight onto the brand palette
         background: "#FAF7F2",

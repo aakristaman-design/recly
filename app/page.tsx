@@ -14,6 +14,7 @@ import {
   type MonthlyCategoryTotal,
 } from "@/lib/dashboard-data";
 import { formatMoney } from "@/lib/money";
+import { CATEGORY_SLUG } from "@/lib/receipt-schema";
 
 // Screen 06 — structure from Figma node 1:8, minus the off-spec parts
 // (greeting, donut, period toggle). Copy voice from §07/§08: the headline
@@ -166,7 +167,7 @@ export default async function Dashboard({
                 {categoryRows.map((row) => (
                   <Link
                     key={row.category}
-                    href={`/category/${row.category.toLowerCase()}`}
+                    href={`/category/${CATEGORY_SLUG[row.category]}`}
                     className="flex items-center gap-3 border-b border-border-light p-4 transition-colors last:border-b-0 hover:bg-surface-faint"
                   >
                     <CategoryDot category={row.category} />

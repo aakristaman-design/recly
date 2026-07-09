@@ -8,7 +8,7 @@ import { TrendChart } from "@/components/dashboard/trend-chart";
 import { createPublicSupabase } from "@/lib/supabase-public";
 import { monthKey } from "@/lib/dashboard-data";
 import { formatMoney } from "@/lib/money";
-import { CATEGORIES, type Category } from "@/lib/receipt-schema";
+import { categoryFromSlug } from "@/lib/receipt-schema";
 
 // Screen 07/08 — one route serves all six categories: the layout is
 // identical, only the accent changes (Decision 5). Structure from Figma
@@ -39,9 +39,7 @@ export default async function CategoryDetail({
 }: {
   params: { slug: string };
 }) {
-  const category = CATEGORIES.find(
-    (c) => c.toLowerCase() === params.slug.toLowerCase(),
-  ) as Category | undefined;
+  const category = categoryFromSlug(params.slug);
   if (!category) notFound();
 
   const supabase = createPublicSupabase();

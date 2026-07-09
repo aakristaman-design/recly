@@ -1,24 +1,30 @@
 import { cn } from "@/lib/utils";
 import type { Category } from "@/lib/receipt-schema";
 
-// One dedicated accent per category (v2.0 §04, Decision 5) — the dot is the
-// visual shortcut; the label does the naming.
+// One dedicated accent per category (Decision 5; palette per addendum v1.1)
+// — the dot is the visual shortcut; the label does the naming.
 export const CATEGORY_HEX: Record<Category, string> = {
   Produce: "#4A9E6B",
-  Dairy: "#4A7EC4",
-  Meat: "#D4697A",
+  "Dairy & Eggs": "#4A7EC4",
+  "Meat & Seafood": "#D4697A",
   Bakery: "#E8A830",
+  Pantry: "#B08968",
+  Beverages: "#5FA8A0",
   Snacks: "#E07840",
   Household: "#8B6EC4",
+  "Dining Out": "#8A877F",
 };
 
 const DOT_CLASS: Record<Category, string> = {
   Produce: "bg-category-produce",
-  Dairy: "bg-category-dairy",
-  Meat: "bg-category-meat",
+  "Dairy & Eggs": "bg-category-dairy",
+  "Meat & Seafood": "bg-category-meat",
   Bakery: "bg-category-bakery",
+  Pantry: "bg-category-pantry",
+  Beverages: "bg-category-beverages",
   Snacks: "bg-category-snacks",
   Household: "bg-category-household",
+  "Dining Out": "bg-category-dining-out",
 };
 
 export function CategoryDot({
