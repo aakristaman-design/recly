@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ArrowLeft, ChevronDown, ReceiptText } from "lucide-react";
 import { CategoryDot, CATEGORY_HEX } from "@/components/brand/category-dot";
+import { DeleteReceiptButton } from "@/components/receipt/delete-receipt-button";
 import { ScanFab } from "@/components/brand/scan-fab";
 import {
   fetchReceiptHistory,
@@ -128,6 +129,12 @@ export default async function ReceiptHistory({
                         </span>
                       </div>
                     ))}
+                    <div className="border-t border-border-light">
+                      <DeleteReceiptButton
+                        receiptId={receipt.id}
+                        itemCount={receipt.item_count}
+                      />
+                    </div>
                   </div>
                 </details>
               );
