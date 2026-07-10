@@ -35,8 +35,9 @@ const config: Config = {
           bg: "#FDF0EF", // bg/danger
         },
         // category palette — in-product UI only (charts, tags, receipt rows).
-        // Nine categories per addendum v1.1; dining-out deliberately reuses
-        // the text/secondary grey so it doesn't compete with food categories.
+        // Ten categories: addendum v1.1's nine plus pets (July 2026 expansion
+        // to general household shopping); dining-out deliberately reuses the
+        // text/secondary grey so it doesn't compete with food categories.
         category: {
           produce: "#4A9E6B",
           dairy: "#4A7EC4",
@@ -46,6 +47,7 @@ const config: Config = {
           beverages: "#5FA8A0",
           snacks: "#E07840",
           household: "#8B6EC4",
+          pets: "#C4915C", // muted terracotta
           "dining-out": "#8A877F",
         },
         // shadcn semantic slots, mapped straight onto the brand palette

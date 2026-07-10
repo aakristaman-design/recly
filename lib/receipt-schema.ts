@@ -1,8 +1,9 @@
 import { z } from "zod";
 
-// The nine locked categories (category addendum v1.1, superseding v2.0 §04's
-// six). OCR must choose one per item; the parsed-receipt screen is where the
-// user corrects wrong guesses.
+// The ten locked categories (category addendum v1.1's nine, plus Pets —
+// July 2026, part of expanding Recly from strictly-grocery to general
+// household shopping). OCR must choose one per item; the parsed-receipt
+// screen is where the user corrects wrong guesses.
 export const CATEGORIES = [
   "Produce",
   "Dairy & Eggs",
@@ -12,6 +13,7 @@ export const CATEGORIES = [
   "Beverages",
   "Snacks",
   "Household",
+  "Pets",
   "Dining Out",
 ] as const;
 
@@ -27,6 +29,7 @@ export const CATEGORY_SLUG: Record<Category, string> = {
   Beverages: "beverages",
   Snacks: "snacks",
   Household: "household",
+  Pets: "pets",
   "Dining Out": "dining-out",
 };
 
