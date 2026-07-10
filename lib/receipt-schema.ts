@@ -54,6 +54,17 @@ export const receiptItemSchema = z.object({
   category: z.enum(CATEGORIES),
 });
 
+// Order-level total-area lines printed between the item subtotal and the
+// grand total: coupon savings, subscription savings, tax, order-level fees.
+// Signed dollars — discounts negative, charges positive — so that
+// items sum + adjustments sum = grand total. Display-only (the total-area
+// summary on the parsed-receipt screen); never attributed to items and
+// never persisted per-item.
+export const receiptAdjustmentSchema = z.object({
+  label: z.string().min(1),
+  amount: z.number(),
+});
+
 export const scanResultSchema = z.object({
   // generated first (schema order) — forces line-by-line transcription
   // before extraction, grounding item fields in the transcribed text
@@ -66,9 +77,11 @@ export const scanResultSchema = z.object({
     .nullable(),
   total: z.number().nullable(),
   items: z.array(receiptItemSchema),
+  adjustments: z.array(receiptAdjustmentSchema),
 });
 
 export type ReceiptItem = z.infer<typeof receiptItemSchema>;
+export type ReceiptAdjustment = z.infer<typeof receiptAdjustmentSchema>;
 export type ScanResult = z.infer<typeof scanResultSchema>;
 
 // POST /api/receipts body — corrected receipt as the user confirmed it.
@@ -102,7 +115,15 @@ export const scanResultJsonSchema = {
   schema: {
     type: "object",
     additionalProperties: false,
-    required: ["transcript", "readable", "store", "date", "total", "items"],
+    required: [
+      "transcript",
+      "readable",
+      "store",
+      "date",
+      "total",
+      "items",
+      "adjustments",
+    ],
     properties: {
       transcript: { type: "string" },
       readable: { type: "boolean" },
@@ -120,6 +141,18 @@ export const scanResultJsonSchema = {
             quantity: { type: "integer" },
             unit_price: { type: "number" },
             category: { type: "string", enum: [...CATEGORIES] },
+          },
+        },
+      },
+      adjustments: {
+        type: "array",
+        items: {
+          type: "object",
+          additionalProperties: false,
+          required: ["label", "amount"],
+          properties: {
+            label: { type: "string" },
+            amount: { type: "number" },
           },
         },
       },

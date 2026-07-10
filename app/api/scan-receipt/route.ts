@@ -18,7 +18,7 @@ Work in two steps inside the JSON:
 
 Rules:
 - Extract every purchased line item, including fees printed as line items (bag charges, bottle deposits, CRV).
-- Exclude: subtotal, tax, total, payment, change, loyalty-points, and savings-summary lines.
+- Exclude from items: subtotal, tax, total, payment, change, loyalty-points, and savings-summary lines. Tax and order-level savings belong in adjustments, never in items.
 - quantity: integer count of units. A quantity prefix like "2@" or "3 @" means that many units — e.g. a line reading "2@ GRAN SMITH APPLES  Price 3.98  You Pay 3.00" is quantity 2, line total 3.00, unit_price 1.50. The "@" is a quantity marker, never part of the item name. Weighted items (e.g. "1.24 lb @ $2.99/lb") are quantity 1.
 - unit_price: the price per unit actually paid, in dollars, so that quantity × unit_price equals what the customer paid for that line. When both a shelf "Price" column and a paid amount ("You Pay", or an amount after a member/card savings line) are printed, always use the paid amount, never the shelf price. For weighted items, unit_price is the full line price.
 - name: short readable name in title case, taken from the printed text. Expand only obvious abbreviations. Never invent items that are not printed.
@@ -26,7 +26,9 @@ Rules:
 - Categorize by what the food fundamentally is, never by where the store shelves or stores it: frozen vegetables are Produce like fresh ones; a frozen multi-ingredient ready meal is Pantry. Storage method is never a category signal.
 - store: the merchant name as printed (e.g. "Safeway", "Trader Joe's"). null if not visible.
 - date: the purchase date as YYYY-MM-DD. US receipts print dates as MM/DD/YY where YY is a two-digit year meaning 20YY — copy the printed digits exactly (e.g. 07/05/26 is 2026-07-05). null if not visible.
-- total: the final amount paid as printed (grand total or balance), in dollars. null if not visible.
+- total: the true final amount paid, in dollars. Receipts and order confirmations often print several total-like lines — "Item(s) Subtotal", "Subtotal", "Total before tax", then a "Grand Total", "Order Total", "Balance Due", or final "Total". Always use the bottom-line grand total after every discount and tax has been applied — never the first total-looking number. When multiple candidates appear, the grand total is the amount actually charged, usually the last and often the largest-printed money line. null if not visible.
+- adjustments: every order-level line printed in the totals section between the item subtotal and the grand total that changes the amount owed — coupon savings, subscription/membership savings, promotions, tax, shipping, order-level fees. Each entry copies the printed label and its amount in dollars, signed: discounts and savings negative, tax and charges positive, so that the sum of item line totals plus the sum of adjustments equals the grand total. Do not include subtotal or total lines themselves, and do not include per-item savings already reflected in an item's paid price. Empty array when the receipt prints no such lines.
+- Never spread order-level discounts across individual items — that would be guessing. Items keep their listed line price; order-level savings live only in adjustments.
 - The photo may be rotated or at an angle; read the text in whatever orientation it runs.
 - If the image is not a receipt, or is too blurry or dark to read line items, set readable to false, items to an empty array, and all other fields to null.`;
 

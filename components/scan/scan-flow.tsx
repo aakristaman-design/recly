@@ -7,6 +7,7 @@ import { ScanProgress } from "@/components/brand/scan-progress";
 import { ReceiptEditor } from "@/components/receipt/receipt-editor";
 import type { EditableItem } from "@/components/receipt/item-row";
 import {
+  adjustmentTotalCents,
   formatMoney,
   parsePriceCents,
   receiptTotalCents,
@@ -38,6 +39,7 @@ const FIXTURE_SCAN: ScanResult = {
     { name: "SC Soup Broccoli", quantity: 2, unit_price: 6.0, category: "Produce" },
     { name: "Recycle Bag Charge", quantity: 1, unit_price: 0.12, category: "Household" },
   ],
+  adjustments: [],
 };
 
 type ScanState =
@@ -128,7 +130,8 @@ export function ScanFlow({ initialFixture, onSaved }: ScanFlowProps) {
       setState({
         phase: "saved",
         itemCount: unitCount(items),
-        totalCents: receiptTotalCents(items),
+        // match the editor's live total: items + order-level discounts/tax
+        totalCents: receiptTotalCents(items) + adjustmentTotalCents(scan.adjustments),
       });
       onSaved?.();
     } catch {

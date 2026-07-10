@@ -4,7 +4,13 @@ import { useState } from "react";
 import { Plus } from "lucide-react";
 import { ItemRow, type EditableItem } from "@/components/receipt/item-row";
 import { ScanCtaButton } from "@/components/brand/scan-cta-button";
-import { formatMoney, receiptTotalCents, unitCount } from "@/lib/money";
+import {
+  adjustmentTotalCents,
+  formatMoney,
+  formatSignedMoney,
+  receiptTotalCents,
+  unitCount,
+} from "@/lib/money";
 import type { ScanResult } from "@/lib/receipt-schema";
 
 // Screen 05 — the human-in-the-loop correction layer (Decision 2). Structure
@@ -63,8 +69,13 @@ export function ReceiptEditor({
       },
     ]);
 
+  // Order-level lines (coupon savings, tax) ride along unchanged as items are
+  // corrected: live total = current items sum + fixed adjustments, so the
+  // footer lands on the receipt's grand total, not the item subtotal.
+  const adjustmentCents = adjustmentTotalCents(scan.adjustments);
+  const liveTotalCents = receiptTotalCents(items) + adjustmentCents;
   const headlineTotalCents =
-    scan.total !== null ? Math.round(scan.total * 100) : receiptTotalCents(items);
+    scan.total !== null ? Math.round(scan.total * 100) : liveTotalCents;
 
   return (
     <div>
@@ -103,6 +114,39 @@ export function ReceiptEditor({
             Add item
           </button>
         </div>
+
+        {/* total-area summary, mirroring the receipt's own totals section:
+            subtotal → order-level discounts/tax → (footer) grand total.
+            Order-level savings are never attributed back to items. */}
+        {scan.adjustments.length > 0 && (
+          <div className="mt-3 rounded-xl border border-border bg-surface-card px-4 py-2">
+            <div className="flex items-baseline justify-between py-2">
+              <span className="text-body text-ink-secondary">Subtotal</span>
+              <span className="font-mono text-data">
+                {formatMoney(receiptTotalCents(items))}
+              </span>
+            </div>
+            {scan.adjustments.map((adjustment, i) => (
+              <div
+                key={`${adjustment.label}-${i}`}
+                className="flex items-baseline justify-between border-t border-border-light py-2"
+              >
+                <span className="text-body text-ink-secondary">
+                  {adjustment.label}
+                </span>
+                <span
+                  className={
+                    adjustment.amount < 0
+                      ? "font-mono text-data text-green-dark"
+                      : "font-mono text-data"
+                  }
+                >
+                  {formatSignedMoney(Math.round(adjustment.amount * 100))}
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* sticky within the sheet's scroll container (Decision 4: the confirm
@@ -112,7 +156,7 @@ export function ReceiptEditor({
           <div>
             <div className="text-label uppercase text-ink-secondary">Total</div>
             <div className="font-mono text-[24px] leading-tight" data-testid="live-total">
-              {formatMoney(receiptTotalCents(items))}
+              {formatMoney(liveTotalCents)}
             </div>
           </div>
           <ScanCtaButton onClick={() => onSave(items)} disabled={saving}>
